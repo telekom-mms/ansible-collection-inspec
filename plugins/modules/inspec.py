@@ -32,6 +32,12 @@ def run_module():
     if module.check_mode:
         module.exit_json(**result)
 
+    src = module.params['src']
+    backend = module.params['backend']
+    host = module.params['host']
+    username = module.params['username']
+    password = module.params['password']
+    privkey = module.params['privkey']
     bin_path = module.params.get('binary_path')
 
     if bin_path is not None:
@@ -41,49 +47,47 @@ def run_module():
 
 
     try:
-        if not os.path.exists(module.params['src']):
-            module.fail_json(msg = f'Could not find file or directory at: {module.params["src"]}')
+        if not os.path.exists(src):
+            module.fail_json(msg = f'Could not find file or directory at: {src}')
 
-        if not module.params['host']:
-            command = f'{run_command} exec {module.params["src"]} --reporter json-min'
+        if not host:
+            command = f'{run_command} exec {src} --reporter json-min'
         else:
-            if not module.params['username']:
+            if not username:
                 module.fail_json(msg = 'username must be defined to run on a remote target!')
-            if not os.environ.get('SSH_AUTH_SOCK') and not module.params['password'] and not module.params['privkey']:
+            if not os.environ.get('SSH_AUTH_SOCK') and not password and not privkey:
                 module.fail_json(msg = 'password or privkey must be defined to run on a remote target! Alternatively, you can use SSH_AUTH_SOCK.')
 
             if os.environ.get('SSH_AUTH_SOCK'):
                 command = '{} exec {} -b {} --host {} --user {} --reporter json-min'.format(
                     run_command,
-                    module.params['src'],
-                    module.params['backend'],
-                    module.params['host'],
-                    module.params['username']
+                    src,
+                    backend,
+                    host,
+                    username,
                 )
-            elif module.params['privkey']:
+            elif privkey:
                 command = '{} exec {} -b {} --host {} --user {} -i {} --reporter json-min'.format(
                     run_command,
-                    module.params['src'],
-                    module.params['backend'],
-                    module.params['host'],
-                    module.params['username'],
-                    module.params['privkey']
+                    src,
+                    backend,
+                    host,
+                    username,
+                    privkey
                 )
             else:
                 command = '{} exec {} -b {} --host {} --user {} --password {} --reporter json-min'.format(
                     run_command,
-                    module.params['src'],
-                    module.params['backend'],
-                    module.params['host'],
-                    module.params['username'],
-                    module.params['password']
+                    src,
+                    backend,
+                    host,
+                    username,
+                    password
                 )
 
 
         rc, stdout, stderr = module.run_command(command)
-        # inspec_result = subprocess.run(command.split(" "), text = True, capture_output = True)
 
-        # if inspec_result.stderr:
         if stderr:
             # if 'cannot execute without accepting the license' in inspec_result.stderr:
             if 'cannot execute without accepting the license' in stderr:
