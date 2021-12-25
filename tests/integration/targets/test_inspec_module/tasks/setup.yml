@@ -1,4 +1,14 @@
 ---
+
+- name: download cinc-auditor
+  get_url:
+    url: https://omnitruck.cinc.sh/install.sh
+    dest: /tmp/install.sh
+    mode: '0775'
+
+- name: install cinc-auditor
+  shell: "bash /tmp/install.sh -s -- -P cinc-auditor -v 4"
+
 - name: Solo Inspec test file
   copy:
     src: test_1.rb
