@@ -39,12 +39,17 @@ options:
     type: str
   privkey:
     description:
-      - The path to the private key to use for remote targets. (SSH)
+      - The path to the private key to use for remote targets (SSH).
     type: str
   binary_path:
     description:
-      - The optional path to inspec or cinc-auditor binary
+      - The optional path to inspec or cinc-auditor binary.
     type: str
+  controls:
+    description:
+      - A list of strings or regexes that define which controls will be run.
+    type: list
+    elements: str
 """
 
 EXAMPLES = """
@@ -78,7 +83,7 @@ def run_module():
         password=dict(type="str", required=False, no_log=True),
         privkey=dict(type="str", required=False, no_log=True),
         binary_path=dict(type="str", required=False),
-        controls=dict(type="list", required=False),
+        controls=dict(type="list", required=False, elements="str"),
     )
 
     result = dict(changed=False, tests=[])
@@ -128,21 +133,11 @@ def run_module():
                 )
 
             if os.environ.get("SSH_AUTH_SOCK"):
-                command = "{} exec {} -b {} --host {} --user {} --controls {} --reporter json-min".format(
-                    run_command,
-                    src,
-                    backend,
-                    host,
-                    username,
-                )
+                command = "{run_command} exec {src} -b {backend} --host {host} --user {username} --controls {controls} --reporter json-min"
             elif privkey:
-                command = "{} exec {} -b {} --host {} --user {} -i {} --reporter json-min".format(
-                    run_command, src, backend, host, username, privkey
-                )
+                command = "{run_command} exec {src} -b {backend} --host {host} --user {username} -i {privkey} --reporter json-min"
             else:
-                command = "{} exec {} -b {} --host {} --user {} --password {} --controls {} --reporter json-min".format(
-                    run_command, src, backend, host, username, password
-                )
+                command = "{run_command} exec {src} -b {backend} --host {host} --user {username} --password {password} --controls {controls} --reporter json-min"
 
         rc, stdout, stderr = module.run_command(command)
 
