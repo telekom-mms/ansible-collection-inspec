@@ -16,7 +16,8 @@ def run_module():
         username = dict(type = 'str', required = False),
         password = dict(type = 'str', required = False, no_log = True),
         privkey = dict(type = 'str', required = False),
-        binary_path = dict(type = 'str', required = False)
+        binary_path = dict(type = 'str', required = False),
+        controls = dict(type = 'list', required = False)
     )
 
     result = dict(
@@ -45,13 +46,20 @@ def run_module():
     else:
         run_command = module.get_bin_path('inspec', required=True)
 
+    controls = module.params.get('controls')
+
+    # if no controls are defined, use a regex to match all controls
+    if not controls:
+        controls = "/.*/"
+    else:
+        controls = " ".join(map(str,controls))
 
     try:
         if not os.path.exists(src):
             module.fail_json(msg = f'Could not find file or directory at: {src}')
 
         if not host:
-            command = f'{run_command} exec {src} --reporter json-min'
+            command = f'{run_command} exec {src} --controls {controls} --reporter json-min'
         else:
             if not username:
                 module.fail_json(msg = 'username must be defined to run on a remote target!')
@@ -59,7 +67,7 @@ def run_module():
                 module.fail_json(msg = 'password or privkey must be defined to run on a remote target! Alternatively, you can use SSH_AUTH_SOCK.')
 
             if os.environ.get('SSH_AUTH_SOCK'):
-                command = '{} exec {} -b {} --host {} --user {} --reporter json-min'.format(
+                command = '{} exec {} -b {} --host {} --user {} --controls {} --reporter json-min'.format(
                     run_command,
                     src,
                     backend,
@@ -76,7 +84,7 @@ def run_module():
                     privkey
                 )
             else:
-                command = '{} exec {} -b {} --host {} --user {} --password {} --reporter json-min'.format(
+                command = '{} exec {} -b {} --host {} --user {} --password {} --controls {} --reporter json-min'.format(
                     run_command,
                     src,
                     backend,
@@ -84,7 +92,6 @@ def run_module():
                     username,
                     password
                 )
-
 
         rc, stdout, stderr = module.run_command(command)
 
