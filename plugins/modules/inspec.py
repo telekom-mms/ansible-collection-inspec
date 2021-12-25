@@ -7,23 +7,15 @@ __metaclass__ = type
 DOCUMENTATION = """
 ---
 module: inspec
-<<<<<<< HEAD
-short_description: Execute Inspec profiles from Ansible
-description:
-   - Add or remove a command to Icinga2 through the director API.
-author: Zaeem Parker (@zp4rker)
-=======
 short_description: Execute Inspec-profiles
 description:
    - Execute Inspec-profiles
 author: zp4rker (@zp4rker)
->>>>>>> origin/github_test_workflow
 notes:
   - This module supports check mode.
 options:
   src:
     description:
-<<<<<<< HEAD
       - The path to the Inspec profile or test file.
     required: True
     type: str
@@ -58,38 +50,6 @@ options:
       - A list of strings or regexes that define which controls will be run.
     type: list
     elements: str
-=======
-      - The path to the Inspec profile or test file
-    required: true
-    type: str
-  backend:
-    description:
-      - The backend transport to use for remote targets
-    required: false
-    type: str
-    choices: ["ssh", "winrm"]
-    default: "ssh"
-  host:
-    description:
-      - The host to use for remote targets
-    type: str
-  username:
-    description:
-      - The username to use for remote targets
-    type: str
-  password:
-    description:
-      - The password to use for remote targets
-    type: str
-  privkey:
-    description:
-      - The path to the private key to use for remote targets (SSH)
-    type: str
-  binary_path:
-    description:
-      - The optional path to inspec or cinc-auditor binary
-    type: str
->>>>>>> origin/github_test_workflow
 """
 
 EXAMPLES = """
@@ -159,27 +119,29 @@ def run_module():
             module.fail_json(msg=f"Could not find file or directory at: {src}")
 
         if not host:
-            command = (
-                f"{run_command} exec {src} --controls {controls} --reporter json-min"
-            )
+            cmd = f"{run_command} exec {src} --controls {controls} --reporter json-min"
         else:
             if not username:
                 module.fail_json(
                     msg="username must be defined to run on a remote target!"
                 )
-            if not os.environ.get("SSH_AUTH_SOCK") and not password and not privkey:
+            if (
+                not os.environ.get("SSH_AUTH_SOCK")
+                and not password
+                and not privkey
+            ):
                 module.fail_json(
                     msg="password or privkey must be defined to run on a remote target! Alternatively, you can use SSH_AUTH_SOCK."
                 )
 
             if os.environ.get("SSH_AUTH_SOCK"):
-                command = "{run_command} exec {src} -b {backend} --host {host} --user {username} --controls {controls} --reporter json-min"
+                cmd = "{run_command} exec {src} -b {backend} --host {host} --user {username} --controls {controls} --reporter json-min"
             elif privkey:
-                command = "{run_command} exec {src} -b {backend} --host {host} --user {username} -i {privkey} --reporter json-min"
+                cmd = "{run_command} exec {src} -b {backend} --host {host} --user {username} -i {privkey} --reporter json-min"
             else:
-                command = "{run_command} exec {src} -b {backend} --host {host} --user {username} --password {password} --controls {controls} --reporter json-min"
+                cmd = "{run_command} exec {src} -b {backend} --host {host} --user {username} --password {password} --controls {controls} --reporter json-min"
 
-        rc, stdout, stderr = module.run_command(command)
+        rc, stdout, stderr = module.run_command(cmd)
 
         if stderr:
             # if 'cannot execute without accepting the license' in inspec_result.stderr:
@@ -189,10 +151,14 @@ def run_module():
                 )
             # elif "Don't understand inspec profile" in inspec_result.stderr:
             elif "Don't understand inspec profile" in stderr:
-                module.fail_json(msg="Inspec was unable to read the profile structure.")
+                module.fail_json(
+                    msg="Inspec was unable to read the profile structure."
+                )
             # elif 'Could not fetch inspec profile' in inspec_result.stderr:
         elif "Could not fetch inspec profile" in stderr:
-            module.fail_json(msg="Inspec was unable to read that profile or test.")
+            module.fail_json(
+                msg="Inspec was unable to read that profile or test."
+            )
 
         # result['tests'] = module.from_json(inspec_result.stdout)['controls']
         result["tests"] = module.from_json(stdout)["controls"]
@@ -217,7 +183,7 @@ def run_module():
             msg=f"This module requires inspec to be installed on the host machine. Searched here: {run_command}"
         )
     except Exception as error:
-        module.fail_json(msg=f"Encountered an error: {error}", cmd=command)
+        module.fail_json(msg=f"Encountered an error: {error}", cmd=cmd)
 
 
 def main():
