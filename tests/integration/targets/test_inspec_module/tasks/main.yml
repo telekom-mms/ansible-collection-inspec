@@ -10,7 +10,6 @@
         - inspec:
             src: "{{src}}"
             binary_path: "/opt/cinc-auditor/bin/cinc-auditor"
-
       rescue:
         - name: Failure case 1 - non-existent file
           assert:

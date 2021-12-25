@@ -7,15 +7,23 @@ __metaclass__ = type
 DOCUMENTATION = """
 ---
 module: inspec
+<<<<<<< HEAD
 short_description: Execute Inspec profiles from Ansible
 description:
    - Add or remove a command to Icinga2 through the director API.
 author: Zaeem Parker (@zp4rker)
+=======
+short_description: Execute Inspec-profiles
+description:
+   - Execute Inspec-profiles
+author: zp4rker (@zp4rker)
+>>>>>>> origin/github_test_workflow
 notes:
   - This module supports check mode.
 options:
   src:
     description:
+<<<<<<< HEAD
       - The path to the Inspec profile or test file.
     required: True
     type: str
@@ -50,6 +58,38 @@ options:
       - A list of strings or regexes that define which controls will be run.
     type: list
     elements: str
+=======
+      - The path to the Inspec profile or test file
+    required: true
+    type: str
+  backend:
+    description:
+      - The backend transport to use for remote targets
+    required: false
+    type: str
+    choices: ["ssh", "winrm"]
+    default: "ssh"
+  host:
+    description:
+      - The host to use for remote targets
+    type: str
+  username:
+    description:
+      - The username to use for remote targets
+    type: str
+  password:
+    description:
+      - The password to use for remote targets
+    type: str
+  privkey:
+    description:
+      - The path to the private key to use for remote targets (SSH)
+    type: str
+  binary_path:
+    description:
+      - The optional path to inspec or cinc-auditor binary
+    type: str
+>>>>>>> origin/github_test_workflow
 """
 
 EXAMPLES = """
