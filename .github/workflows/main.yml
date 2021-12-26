@@ -23,6 +23,7 @@ jobs:
           - stable-2.9
           - stable-2.10
           - stable-2.11
+          - stable-2.12
           - devel
     runs-on: ubuntu-latest
     steps:
@@ -117,7 +118,7 @@ jobs:
         run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
 
       - name: Install cinc-auditor
-        run: curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-auditor -v 4
+        run: curl -L https://omnitruck.cinc.sh/install.sh | bash -s -- -P cinc-auditor -v 4
 
       - name: Run integration tests
         run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --python ${{ matrix.python }} --requirements --coverage
