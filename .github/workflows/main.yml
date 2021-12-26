@@ -89,15 +89,17 @@ jobs:
           - stable-2.9
           - stable-2.10
           - stable-2.11
+          - stable-2.12
           - devel
         python:
           - 3.7
           - 3.8
           - 3.9
         exclude:
-          # Because ansible-test doesn't support python3.9 for Ansible 2.9
-          - ansible: stable-2.9
-            python: 3.9
+          - ansible: stable-2.12
+            python: 3.7
+          - ansible: devel
+            python: 3.7
     defaults:
       run:
         working-directory: ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
