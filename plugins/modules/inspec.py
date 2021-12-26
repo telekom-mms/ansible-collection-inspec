@@ -135,11 +135,11 @@ def run_module():
                 )
 
             if os.environ.get("SSH_AUTH_SOCK"):
-                cmd = "{run_command} exec {src} -b {backend} --host {host} --user {username} --controls {controls} --reporter json-min"
+                cmd = f"{run_command} exec {src} -b {backend} --host {host} --user {username} --controls {controls} --reporter json-min"
             elif privkey:
-                cmd = "{run_command} exec {src} -b {backend} --host {host} --user {username} -i {privkey} --reporter json-min"
+                cmd = f"{run_command} exec {src} -b {backend} --host {host} --user {username} -i {privkey} --reporter json-min"
             else:
-                cmd = "{run_command} exec {src} -b {backend} --host {host} --user {username} --password {password} --controls {controls} --reporter json-min"
+                cmd = f"{run_command} exec {src} -b {backend} --host {host} --user {username} --password {password} --controls {controls} --reporter json-min"
 
         rc, stdout, stderr = module.run_command(cmd)
 
